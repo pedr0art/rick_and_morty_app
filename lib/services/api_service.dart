@@ -25,7 +25,10 @@ class ApiService {
   Future<Map<String, dynamic>> fetchCharacters(int page) async {
     final url = Uri.parse('$_baseUrl/character?page=$page');
 
-    final response = await http.get(url);
+    final response = await http.get(url).timeout(
+    const Duration(seconds: 10),
+    onTimeout: () => throw Exception('Tempo limite de conexão esgotado'),
+    );
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -52,7 +55,10 @@ class ApiService {
   /// Busca os detalhes de um único personagem pelo ID.
   Future<CharacterModel> fetchCharacterById(int id) async {
     final url = Uri.parse('$_baseUrl/character/$id');
-    final response = await http.get(url);
+    final response = await http.get(url).timeout(
+    const Duration(seconds: 10),
+    onTimeout: () => throw Exception('Tempo limite de conexão esgotado'),
+    );
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -70,7 +76,10 @@ class ApiService {
 
     final idsStr = ids.join(',');
     final url = Uri.parse('$_baseUrl/character/$idsStr');
-    final response = await http.get(url);
+    final response = await http.get(url).timeout(
+  const Duration(seconds: 10),
+  onTimeout: () => throw Exception('Tempo limite de conexão esgotado'),
+);
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -98,7 +107,10 @@ class ApiService {
   ///   - 'hasNextPage': bool
   Future<Map<String, dynamic>> fetchLocations(int page) async {
     final url = Uri.parse('$_baseUrl/location?page=$page');
-    final response = await http.get(url);
+    final response = await http.get(url).timeout(
+  const Duration(seconds: 10),
+  onTimeout: () => throw Exception('Tempo limite de conexão esgotado'),
+);
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body) as Map<String, dynamic>;
