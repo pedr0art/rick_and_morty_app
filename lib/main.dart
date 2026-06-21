@@ -1,35 +1,33 @@
 // ============================================================
-// MAIN.DART — Ponto de entrada do app
-// Aqui configuramos todos os Providers e iniciamos o app.
-// MultiProvider permite registrar vários providers de uma vez.
+// MAIN.DART — aplica o tema escuro globalmente
 // ============================================================
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'providers/character_provider.dart';
 import 'providers/location_provider.dart';
 import 'providers/favorites_provider.dart';
 import 'screens/home_screen.dart';
+import 'theme/app_theme.dart';
 
 void main() async {
-  // Necessário para usar plugins antes do runApp
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Cria o FavoritesProvider e carrega os favoritos salvos ANTES de mostrar o app
+  // Barra de status com ícones claros (fundo escuro)
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.light,
+  ));
+
   final favoritesProvider = FavoritesProvider();
   await favoritesProvider.loadFavorites();
 
   runApp(
-    // MultiProvider disponibiliza os providers para toda a árvore de widgets
     MultiProvider(
       providers: [
-        // CharacterProvider: gerencia a lista de personagens
         ChangeNotifierProvider(create: (_) => CharacterProvider()),
-
-        // LocationProvider: gerencia a lista de locais
         ChangeNotifierProvider(create: (_) => LocationProvider()),
-
-        // FavoritesProvider: gerencia favoritos (já carregados acima)
         ChangeNotifierProvider.value(value: favoritesProvider),
       ],
       child: const RickAndMortyApp(),
@@ -44,17 +42,9 @@ class RickAndMortyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Guia Rick and Morty',
-      debugShowCheckedModeBanner: false, // remove a faixa "debug" do canto
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF00B5CC),
-        ),
-        useMaterial3: true,
-        // Fonte padrão do app
-        textTheme: const TextTheme(
-          titleLarge: TextStyle(fontWeight: FontWeight.bold),
-        ),
-      ),
+      debugShowCheckedModeBanner: false,
+      // Aplica o tema escuro em todo o app
+      theme: AppTheme.darkTheme,
       home: const HomeScreen(),
     );
   }

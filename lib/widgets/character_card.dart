@@ -1,16 +1,15 @@
 // ============================================================
-// WIDGET: CharacterCard
-// Card reutilizável que exibe um personagem na lista.
-// Recebe o personagem e uma função de callback ao tocar.
+// WIDGET: CharacterCard — visual dark temático
 // ============================================================
 
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../models/character_model.dart';
+import '../theme/app_theme.dart';
 
 class CharacterCard extends StatelessWidget {
   final CharacterModel character;
-  final VoidCallback onTap; // função chamada ao tocar no card
+  final VoidCallback onTap;
 
   const CharacterCard({
     super.key,
@@ -18,69 +17,87 @@ class CharacterCard extends StatelessWidget {
     required this.onTap,
   });
 
-  // Retorna a cor do status (verde = vivo, vermelho = morto, cinza = desconhecido)
   Color _statusColor(String status) {
     switch (status.toLowerCase()) {
-      case 'alive':
-        return Colors.green;
-      case 'dead':
-        return Colors.red;
-      default:
-        return Colors.grey;
+      case 'alive':  return AppColors.portalGreen;
+      case 'dead':   return AppColors.red;
+      default:       return AppColors.textMuted;
     }
   }
 
-  // Traduz o status para português
+  Color _statusBg(String status) {
+    switch (status.toLowerCase()) {
+      case 'alive':  return const Color(0x1A39D353);
+      case 'dead':   return const Color(0x1AEF4444);
+      default:       return const Color(0x1A6E7681);
+    }
+  }
+
   String _statusText(String status) {
     switch (status.toLowerCase()) {
-      case 'alive':
-        return 'Vivo';
-      case 'dead':
-        return 'Morto';
-      default:
-        return 'Desconhecido';
+      case 'alive':  return 'Vivo';
+      case 'dead':   return 'Morto';
+      default:       return 'Desconhecido';
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+      decoration: BoxDecoration(
+        color: AppColors.bgSurface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.border, width: 1),
+      ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
+        splashColor: AppColors.portalGreen.withValues(alpha: 0.05),
+        highlightColor: AppColors.portalGreen.withValues(alpha: 0.03),
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Row(
             children: [
-              // Imagem do personagem com cache para não baixar toda vez
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: CachedNetworkImage(
-                  imageUrl: character.image,
-                  width: 80,
-                  height: 80,
-                  fit: BoxFit.cover,
-                  // Placeholder enquanto carrega
-                  placeholder: (context, url) => Container(
-                    width: 80,
-                    height: 80,
-                    color: Colors.grey[200],
-                    child: const Center(child: CircularProgressIndicator()),
+              // Avatar com borda verde sutil
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: AppColors.portalGreenBorder,
+                    width: 1.5,
                   ),
-                  // Imagem de erro se falhar
-                  errorWidget: (context, url, error) => Container(
-                    width: 80,
-                    height: 80,
-                    color: Colors.grey[300],
-                    child: const Icon(Icons.person, size: 40),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(9),
+                  child: CachedNetworkImage(
+                    imageUrl: character.image,
+                    width: 64,
+                    height: 64,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(
+                      width: 64,
+                      height: 64,
+                      color: AppColors.bgElevated,
+                      child: const Center(
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                    ),
+                    errorWidget: (context, url, error) => Container(
+                      width: 64,
+                      height: 64,
+                      color: AppColors.bgElevated,
+                      child: const Icon(Icons.person, size: 32, color: AppColors.textMuted),
+                    ),
                   ),
                 ),
               ),
               const SizedBox(width: 12),
-              // Informações do personagem
+              // Informações
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,45 +105,67 @@ class CharacterCard extends StatelessWidget {
                     Text(
                       character.name,
                       style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
                       ),
-                      maxLines: 2,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
-                    // Indicador colorido de status
+                    const SizedBox(height: 5),
+                    // Badge de status
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: _statusBg(character.status),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: BoxDecoration(
+                              color: _statusColor(character.status),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            '${_statusText(character.status)} · ${character.species}',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: _statusColor(character.status),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 5),
                     Row(
                       children: [
-                        Container(
-                          width: 10,
-                          height: 10,
-                          decoration: BoxDecoration(
-                            color: _statusColor(character.status),
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          '${_statusText(character.status)} - ${character.species}',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey[600],
+                        const Icon(Icons.place_outlined, size: 11, color: AppColors.textMuted),
+                        const SizedBox(width: 3),
+                        Expanded(
+                          child: Text(
+                            character.locationName,
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: AppColors.textMuted,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      character.locationName,
-                      style: TextStyle(fontSize: 12, color: Colors.grey[500]),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right, color: Colors.grey),
+              const SizedBox(width: 8),
+              const Icon(Icons.chevron_right, color: AppColors.textMuted, size: 18),
             ],
           ),
         ),

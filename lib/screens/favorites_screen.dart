@@ -1,12 +1,11 @@
 // ============================================================
-// TELA: FavoritesScreen (Personagens Favoritos)
-// Exibe os personagens salvos como favoritos.
-// Os dados vêm do FavoritesProvider (persistidos localmente).
+// TELA: FavoritesScreen — dark theme
 // ============================================================
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/favorites_provider.dart';
+import '../theme/app_theme.dart';
 import '../widgets/character_card.dart';
 import 'character_detail_screen.dart';
 
@@ -16,43 +15,61 @@ class FavoritesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.bgBase,
       appBar: AppBar(
-        title: const Text('Favoritos'),
-        backgroundColor: const Color(0xFFE94560),
-        foregroundColor: Colors.white,
+        backgroundColor: AppColors.bgBase,
+        title: const Text('Favoritos', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600)),
+        leading: IconButton(
+          icon: Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: AppColors.bgSurface,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: const Icon(Icons.arrow_back_ios_new_rounded, size: 14, color: AppColors.textSecondary),
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(height: 1, color: AppColors.border),
+        ),
       ),
-      // Consumer ouve FavoritesProvider e reconstrói quando favoritos mudam
       body: Consumer<FavoritesProvider>(
         builder: (context, favoritesProvider, child) {
           final favorites = favoritesProvider.favorites;
 
-          // Lista vazia
           if (favorites.isEmpty) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.star_border, size: 80, color: Colors.grey[400]),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Nenhum favorito ainda!',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Colors.grey[600],
-                        ),
+                  Container(
+                    width: 80, height: 80,
+                    decoration: BoxDecoration(
+                      color: AppColors.amberDim,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.star_outline_rounded, size: 40, color: AppColors.amber),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Abra um personagem e toque na estrela ⭐',
-                    style: TextStyle(color: Colors.grey[500]),
-                    textAlign: TextAlign.center,
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Nenhum favorito ainda',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Abra um personagem e toque na estrela',
+                    style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
                   ),
                 ],
               ),
             );
           }
 
-          // Lista de favoritos
           return ListView.builder(
+            padding: const EdgeInsets.symmetric(vertical: 12),
             itemCount: favorites.length,
             itemBuilder: (context, index) {
               final character = favorites[index];
@@ -60,9 +77,7 @@ class FavoritesScreen extends StatelessWidget {
                 character: character,
                 onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => CharacterDetailScreen(character: character),
-                  ),
+                  MaterialPageRoute(builder: (_) => CharacterDetailScreen(character: character)),
                 ),
               );
             },
