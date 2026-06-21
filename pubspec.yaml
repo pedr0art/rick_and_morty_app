@@ -1,0 +1,36 @@
+name: rick_and_morty_app
+description: Guia Rick and Morty - Trabalho Prático Flutter
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Requisições HTTP
+  http: ^1.2.0
+
+  # Gerenciamento de estado
+  provider: ^6.1.2
+
+  # Persistência local (favoritos)
+  shared_preferences: ^2.2.3
+
+  # Cache de imagens da rede
+  cached_network_image: ^3.3.1
+
+  # Ícones
+  cupertino_icons: ^1.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
